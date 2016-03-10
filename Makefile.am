@@ -85,14 +85,17 @@ endif
 
 if WITH_WALLET
 include_HEADERS += \
-	include/btc/logdb.h
-	
+	include/btc/logdb.h \
+	include/btc/wallet.h
+
 libbtc_la_SOURCES += \
-	src/logdb.c
+	src/logdb.c \
+	src/wallet.c
 
 if USE_TESTS
 tests_SOURCES += \
-	test/logdb_tests.c
+	test/logdb_tests.c \
+	test/wallet_tests.c
 endif
 endif
 

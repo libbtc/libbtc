@@ -58,6 +58,7 @@ extern void test_eckey();
 
 #ifdef WITH_WALLET
 extern void test_logdb();
+extern void test_wallet();
 #endif
 
 extern void btc_ecc_start();
@@ -96,6 +97,7 @@ int main()
 
 #ifdef WITH_WALLET
     u_run_test(test_logdb);
+    u_run_test(test_wallet);
 #endif
 
     btc_ecc_stop();

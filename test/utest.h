@@ -103,6 +103,21 @@
         } while (0);                                                     \
     }
 
+#define u_assert_uint32_eq(R, E)                                         \
+    {                                                                    \
+        uint64_t r_ = (R);                                               \
+        uint64_t e_ = (E);                                               \
+        do {                                                             \
+            if (r_ != e_) {                                              \
+                printf("FAILED - %s() - Line %d\n", __func__, __LINE__); \
+                printf("\tExpect: \t%lld\n", e_);                        \
+                printf("\tReceive:\t%lld\n", r_);                        \
+                U_TESTS_FAIL++;                                          \
+                return;                                                  \
+            };                                                           \
+        } while (0);                                                     \
+    }
+
 #define u_assert_str_eq(R, E)                                            \
     {                                                                    \
         const char* r_ = (R);                                            \

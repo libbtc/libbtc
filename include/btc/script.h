@@ -225,7 +225,6 @@ LIBBTC_API btc_bool btc_script_build_multisig(cstring* script_in, unsigned int r
 LIBBTC_API btc_bool btc_script_build_p2pkh(cstring* script, const uint8_t* hash160);
 LIBBTC_API btc_bool btc_script_build_p2sh(cstring* script_in, const uint8_t* hash160);
 
-LIBBTC_API enum txnouttype btc_script_get_type(cstring* script_in);
 #ifdef __cplusplus
 }
 #endif
