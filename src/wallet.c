@@ -133,7 +133,7 @@ void btc_wallet_wtx_serialize(cstring* s, const btc_wtx* wtx)
 btc_bool btc_wallet_wtx_deserialize(btc_wtx* wtx, struct const_buffer* buf)
 {
     deser_u32(&wtx->height, buf);
-    return btc_tx_deserialize(buf->p, buf->len, wtx->tx);
+    return btc_tx_deserialize(buf->p, buf->len, wtx->tx, NULL);
 }
 
 /*

@@ -153,9 +153,11 @@ btc_bool btc_tx_out_deserialize(btc_tx_out* tx_out, struct const_buffer* buf)
     return true;
 }
 
-int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx* tx)
+int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx* tx, size_t *consumed_length)
 {
     struct const_buffer buf = {tx_serialized, inlen};
+    if (consumed_length)
+        *consumed_length = 0;
 
     //tx needs to be initialized
     deser_s32(&tx->version, &buf);
@@ -189,6 +191,8 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
     if (!deser_u32(&tx->locktime, &buf))
         return false;
 
+    if (consumed_length)
+        *consumed_length = inlen-buf.len;
     return true;
 }
 

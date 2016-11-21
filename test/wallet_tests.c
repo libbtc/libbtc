@@ -97,7 +97,7 @@ void test_wallet()
     int outlen ;
     utils_hex_to_bin(hextx_coinbase, tx_data, strlen(hextx_coinbase), &outlen);
     btc_wtx* wtx = btc_wallet_wtx_new();
-    btc_tx_deserialize(tx_data, outlen, wtx->tx);
+    btc_tx_deserialize(tx_data, outlen, wtx->tx, NULL);
 
     // add coinbase tx
     wtx->height = 0;
@@ -115,7 +115,7 @@ void test_wallet()
     uint8_t tx_data_n[strlen(hextx_ntx) / 2];
     utils_hex_to_bin(hextx_ntx, tx_data_n, strlen(hextx_ntx), &outlen);
     wtx = btc_wallet_wtx_new();
-    btc_tx_deserialize(tx_data_n, outlen, wtx->tx);
+    btc_tx_deserialize(tx_data_n, outlen, wtx->tx, NULL);
     
     // add normal tx
     wtx->height = 0;

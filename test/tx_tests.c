@@ -660,7 +660,7 @@ void test_tx_serialization()
         utils_hex_to_bin(one_test->hextx, tx_data, strlen(one_test->hextx), &outlen);
 
         btc_tx* tx = btc_tx_new();
-        btc_tx_deserialize(tx_data, outlen, tx);
+        btc_tx_deserialize(tx_data, outlen, tx, NULL);
 
         btc_tx* tx_copy = btc_tx_new();
         btc_tx_copy(tx_copy, tx);
@@ -709,7 +709,7 @@ void test_tx_sighash()
         utils_hex_to_bin(test->txhex, tx_data, strlen(test->txhex), &outlen);
 
         btc_tx* tx = btc_tx_new();
-        btc_tx_deserialize(tx_data, outlen, tx);
+        btc_tx_deserialize(tx_data, outlen, tx, NULL);
 
         uint8_t script_data[strlen(test->script) / 2];
         utils_hex_to_bin(test->script, script_data, strlen(test->script), &outlen);
@@ -750,7 +750,7 @@ void test_tx_negative_version()
     utils_hex_to_bin(txhex, tx_data, strlen(txhex), &outlen);
 
     btc_tx* tx = btc_tx_new();
-    btc_tx_deserialize(tx_data, outlen, tx);
+    btc_tx_deserialize(tx_data, outlen, tx, NULL);
     u_assert_int_eq(versionGoal, tx->version);
 
     btc_tx_free(tx);
