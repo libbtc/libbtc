@@ -5,7 +5,6 @@ libbtc – A fast, clean and small bitcoin C library
 
 [![Build Status](https://travis-ci.org/libbtc/libbtc.svg?branch=master)](https://travis-ci.org/libbtc/libbtc)  [![Coverage Status](https://coveralls.io/repos/libbtc/libbtc/badge.svg?branch=master&service=github)](https://coveralls.io/github/libbtc/libbtc?branch=master)
 
-
 What is libbtc?
 ----------------
 
