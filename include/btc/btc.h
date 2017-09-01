@@ -69,6 +69,7 @@ extern "C" {
 
 #define BTC_MIN(a,b) (((a)<(b))?(a):(b))
 #define BTC_MAX(a,b) (((a)>(b))?(a):(b))
+#define MEMSET_BZERO(p,l)	memset((p), 0, (l))
 
 typedef uint8_t uint256[32];
 typedef uint8_t uint160[20];

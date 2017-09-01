@@ -39,6 +39,12 @@ AC_ARG_ENABLE([debug],
   [enable_debug=$enableval],
   [enable_debug=no])
 
+AC_ARG_ENABLE([bip39_cache],
+  [AS_HELP_STRING([--enable-bip39-cache],
+                 [use bip39_cache (default is no)])],
+  [enable_bip39_cache=$enableval],
+  [enable_bip39_cache=no])
+
 AC_ARG_ENABLE([wallet],
   [AS_HELP_STRING([--disable-wallet],
   [disable wallet/database functions])],
@@ -85,6 +91,10 @@ if test "x$enable_debug" = xyes; then
   CFLAGS="$CFLAGS -g3 -O0 -DDEBUG"
   CXXFLAGS="$CXXFLAGS -g3 -O0 -DDEBUG"
   AC_DEFINE_UNQUOTED([ENABLE_DEBUG],[1],[Define to 1 to enable debung output])
+fi
+
+if test "x$enable_bip39_cache" = xyes; then
+  AC_DEFINE_UNQUOTED([ENABLE_BIP39_CACHE],[1],[Define to 1 to enable bip39 cache])
 fi
 
 AC_ARG_ENABLE(tests,
