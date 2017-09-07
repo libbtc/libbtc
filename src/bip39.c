@@ -273,6 +273,6 @@ const char * const *mnemonic_wordlist(const char *lang)
 	if (!strcmp(lang, "zh"))
 		return wordlist_zh;
 	else if (!strcmp(lang, "en"))
-    	return wordlist_en;
+    		return wordlist_en;
 	return NULL;
 }
