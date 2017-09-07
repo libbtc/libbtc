@@ -14,6 +14,7 @@ include_HEADERS = \
     include/btc/aes256_cbc.h \
     include/btc/base58.h \
     include/btc/bip32.h \
+    include/btc/bip39.h \
     include/btc/block.h \
     include/btc/btc.h \
     include/btc/buffer.h \
@@ -23,7 +24,9 @@ include_HEADERS = \
     include/btc/ecc_key.h \
     include/btc/ecc.h \
     include/btc/hash.h \
+    include/btc/hmac.h \
     include/btc/portable_endian.h \
+    include/btc/pbkdf2.h \
     include/btc/random.h \
     include/btc/script.h \
     include/btc/segwit_addr.h \
@@ -45,6 +48,7 @@ libbtc_la_SOURCES = \
     src/aes256_cbc.c \
     src/base58.c \
     src/bip32.c \
+    src/bip39.c \
     src/block.c \
     src/buffer.c \
     src/chainparams.c \
@@ -53,8 +57,10 @@ libbtc_la_SOURCES = \
     src/ctaes.c \
     src/ecc_key.c \
     src/ecc_libsecp256k1.c \
+    src/hmac.c \
     src/memory.c \
     src/memory.h \
+    src/pbkdf2.c \
     src/random.c \
     src/ripemd160.c \
     src/script.c \

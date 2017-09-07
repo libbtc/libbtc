@@ -96,10 +96,6 @@
 #error Define BYTE_ORDER to be equal to either LITTLE_ENDIAN or BIG_ENDIAN
 #endif
 
-typedef uint8_t sha2_byte;    /* Exactly 1 byte */
-typedef uint32_t sha2_word32; /* Exactly 4 bytes */
-typedef uint64_t sha2_word64; /* Exactly 8 bytes */
-
 /*** SHA-256/384/512 Various Length Definitions ***********************/
 /* NOTE: Most of these are in sha2.h */
 #define SHA256_SHORT_BLOCK_LENGTH (SHA256_BLOCK_LENGTH - 8)
@@ -177,9 +173,6 @@ typedef uint64_t sha2_word64; /* Exactly 8 bytes */
  * only.
  */
 void sha512_Last(SHA512_CTX*);
-void sha256_Transform(SHA256_CTX*, const sha2_word32*);
-void sha512_Transform(SHA512_CTX*, const sha2_word64*);
-
 
 /*** SHA-XYZ INITIAL HASH VALUES AND CONSTANTS ************************/
 /* Hash constant words K for SHA-256: */
