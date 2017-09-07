@@ -44,13 +44,18 @@ void pbkdf2_hmac_sha256_Init(PBKDF2_HMAC_SHA256_CTX *pctx, const uint8_t *pass, 
 	ctx.bitcount = SHA256_BLOCK_LENGTH * 8;
 	sha256_Update(&ctx, salt, saltlen);
 	sha256_Update(&ctx, (uint8_t*)&blocknr, sizeof(blocknr));
-	sha256_Final(&ctx, (uint8_t*)pctx->g);
+	sha256_Final((uint8_t*)pctx->g, &ctx);
 #if BYTE_ORDER == LITTLE_ENDIAN
 	for (uint32_t k = 0; k < SHA256_DIGEST_LENGTH / sizeof(uint32_t); k++) {
 		REVERSE32(pctx->g[k], pctx->g[k]);
 	}
 #endif
-	sha256_Transform(pctx->odig, pctx->g, pctx->g);
+	// sha256_Transform(pctx->odig, pctx->g, pctx->g);
+	SHA256_CTX context;
+	memcpy(context.state, pctx->odig, sizeof(pctx->odig));
+	sha256_Transform(&context, pctx->g);
+	memcpy(pctx->g, context.state, sizeof(context.state));
+
 	memcpy(pctx->f, pctx->g, SHA256_DIGEST_LENGTH);
 	pctx->first = 1;
 }
@@ -58,8 +63,17 @@ void pbkdf2_hmac_sha256_Init(PBKDF2_HMAC_SHA256_CTX *pctx, const uint8_t *pass, 
 void pbkdf2_hmac_sha256_Update(PBKDF2_HMAC_SHA256_CTX *pctx, uint32_t iterations)
 {
 	for (uint32_t i = pctx->first; i < iterations; i++) {
-		sha256_Transform(pctx->idig, pctx->g, pctx->g);
-		sha256_Transform(pctx->odig, pctx->g, pctx->g);
+		// sha256_Transform(pctx->idig, pctx->g, pctx->g);
+		SHA256_CTX context;
+		memcpy(context.state, pctx->idig, sizeof(pctx->idig));
+		sha256_Transform(&context, pctx->g);
+		memcpy(pctx->g, context.state, sizeof(context.state));
+
+		// sha256_Transform(pctx->odig, pctx->g, pctx->g);
+		memcpy(context.state, pctx->odig, sizeof(pctx->odig));
+		sha256_Transform(&context, pctx->g);
+		memcpy(pctx->g, context.state, sizeof(context.state));
+
 		for (uint32_t j = 0; j < SHA256_DIGEST_LENGTH/sizeof(uint32_t); j++) {
 			pctx->f[j] ^= pctx->g[j];
 		}
@@ -104,13 +118,18 @@ void pbkdf2_hmac_sha512_Init(PBKDF2_HMAC_SHA512_CTX *pctx, const uint8_t *pass, 
 	ctx.bitcount[1] = 0;
 	sha512_Update(&ctx, salt, saltlen);
 	sha512_Update(&ctx, (uint8_t*)&blocknr, sizeof(blocknr));
-	sha512_Final(&ctx, (uint8_t*)pctx->g);
+	sha512_Final((uint8_t*)pctx->g, &ctx);
 #if BYTE_ORDER == LITTLE_ENDIAN
 	for (uint32_t k = 0; k < SHA512_DIGEST_LENGTH / sizeof(uint64_t); k++) {
 		REVERSE64(pctx->g[k], pctx->g[k]);
 	}
 #endif
-	sha512_Transform(pctx->odig, pctx->g, pctx->g);
+	// sha512_Transform(pctx->odig, pctx->g, pctx->g);
+	SHA512_CTX context;
+	memcpy(context.state, pctx->odig, sizeof(pctx->odig));
+	sha512_Transform(&context, pctx->g);
+	memcpy(pctx->g, context.state, sizeof(context.state));
+
 	memcpy(pctx->f, pctx->g, SHA512_DIGEST_LENGTH);
 	pctx->first = 1;
 }
@@ -118,8 +137,17 @@ void pbkdf2_hmac_sha512_Init(PBKDF2_HMAC_SHA512_CTX *pctx, const uint8_t *pass, 
 void pbkdf2_hmac_sha512_Update(PBKDF2_HMAC_SHA512_CTX *pctx, uint32_t iterations)
 {
 	for (uint32_t i = pctx->first; i < iterations; i++) {
-		sha512_Transform(pctx->idig, pctx->g, pctx->g);
-		sha512_Transform(pctx->odig, pctx->g, pctx->g);
+		// sha512_Transform(pctx->idig, pctx->g, pctx->g);
+		SHA512_CTX context;
+		memcpy(context.state, pctx->idig, sizeof(pctx->idig));
+		sha512_Transform(&context, pctx->g);
+		memcpy(pctx->g, context.state, sizeof(context.state));
+
+		// sha512_Transform(pctx->odig, pctx->g, pctx->g);
+		memcpy(context.state, pctx->odig, sizeof(pctx->odig));
+		sha512_Transform(&context, pctx->g);
+		memcpy(pctx->g, context.state, sizeof(context.state));
+
 		for (uint32_t j = 0; j < SHA512_DIGEST_LENGTH / sizeof(uint64_t); j++) {
 			pctx->f[j] ^= pctx->g[j];
 		}
