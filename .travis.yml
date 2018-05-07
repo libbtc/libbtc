@@ -1,5 +1,9 @@
 language: c
 
+compiler:
+  - gcc
+  - clang
+
 cache:
   apt: true
   directories:
