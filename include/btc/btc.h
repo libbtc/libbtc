@@ -68,7 +68,6 @@ typedef uint8_t btc_bool; //!serialize, c/c++ save bool
 #define BTC_ECKEY_UNCOMPRESSED_LENGTH 65
 #define BTC_ECKEY_COMPRESSED_LENGTH 33
 #define BTC_ECKEY_PKEY_LENGTH 32
-#define BTC_ECKEY_PKEY_LENGTH 32
 #define BTC_HASH_LENGTH 32
 
 #define BTC_MIN(a,b) (((a)<(b))?(a):(b))

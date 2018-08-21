@@ -26,6 +26,39 @@
 
 #include <btc/ripemd160.h>
 
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN 1234
+#define BIG_ENDIAN 4321
+#endif
+
+#ifndef BYTE_ORDER
+#define BYTE_ORDER LITTLE_ENDIAN
+#endif
+
+#if !defined(BYTE_ORDER) || (BYTE_ORDER != LITTLE_ENDIAN && BYTE_ORDER != BIG_ENDIAN)
+#error Define BYTE_ORDER to be equal to either LITTLE_ENDIAN or BIG_ENDIAN
+#endif
+
+/*** ENDIAN REVERSAL MACROS *******************************************/
+#if BYTE_ORDER != LITTLE_ENDIAN
+#define TOLITTLE32(x) (((x) & 0x000000FF) << 24) | \
+                      (((x) & 0x0000FF00) <<  8) | \
+                      (((x) & 0x00FF0000) >>  8) | \
+                      (((x) & 0xFF000000) >> 24)
+#define TOLITTLE64(x) (((x) & 0x00000000000000FFULL) << 56) | \
+                      (((x) & 0x000000000000FF00ULL) << 40) | \
+                      (((x) & 0x0000000000FF0000ULL) << 24) | \
+                      (((x) & 0x00000000FF000000ULL) <<  8) | \
+                      (((x) & 0x000000FF00000000ULL) >>  8) | \
+                      (((x) & 0x0000FF0000000000ULL) >> 24) | \
+                      (((x) & 0x00FF000000000000ULL) >> 40) | \
+                      (((x) & 0xFF00000000000000ULL) >> 56);
+#else
+#define TOLITTLE32(x) (x)
+#define TOLITTLE64(x) (x)
+#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+
+
 #define ROL(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
 #define F(x, y, z) ((x) ^ (y) ^ (z))
@@ -97,8 +130,10 @@
 
 static void compress(uint32_t* MDbuf, uint32_t* X)
 {
-    uint32_t aa = MDbuf[0], bb = MDbuf[1], cc = MDbuf[2], dd = MDbuf[3], ee = MDbuf[4];
-    uint32_t aaa = MDbuf[0], bbb = MDbuf[1], ccc = MDbuf[2], ddd = MDbuf[3], eee = MDbuf[4];
+    uint32_t aa = TOLITTLE32(MDbuf[0]), bb = TOLITTLE32(MDbuf[1]);
+    uint32_t cc = TOLITTLE32(MDbuf[2]), dd = TOLITTLE32(MDbuf[3]);
+    uint32_t ee = TOLITTLE32(MDbuf[4]);
+    uint32_t aaa = aa, bbb = bb, ccc = cc, ddd = dd, eee = ee;
 
     /* round 1 */
     FF(aa, bb, cc, dd, ee, X[0], 11);
@@ -296,42 +331,29 @@ void btc_ripemd160(const uint8_t* msg, uint32_t msg_len, uint8_t* hash)
     uint32_t digest[5] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0UL};
 
     for (i = 0; i < (msg_len >> 6); ++i) {
-        uint32_t chunk[16];
-
-        for (j = 0; j < 16; ++j) {
-            chunk[j] = (uint32_t)(*(msg++));
-            chunk[j] |= (uint32_t)(*(msg++)) << 8;
-            chunk[j] |= (uint32_t)(*(msg++)) << 16;
-            chunk[j] |= (uint32_t)(*(msg++)) << 24;
-        }
-
-        compress(digest, chunk);
+        compress(digest, (uint32_t *)msg);
+        msg += 64;
     }
 
     // Last chunk
     {
-        uint32_t chunk[16] = {0};
+        uint8_t chunk[64] = {0};
+        uint32_t last_len = msg_len & 63;
+        
+        memcpy(chunk, msg, last_len);
+        chunk[last_len] = 0x80;
 
-        for (i = 0; i < (msg_len & 63); ++i) {
-            chunk[i >> 2] ^= (uint32_t)*msg++ << ((i & 3) << 3);
-        }
-
-        chunk[(msg_len >> 2) & 15] ^= (uint32_t)1 << (8 * (msg_len & 3) + 7);
-
-        if ((msg_len & 63) > 55) {
-            compress(digest, chunk);
+        if (last_len > 55) {
+            compress(digest, (uint32_t *)chunk);
             memset(chunk, 0, 64);
         }
 
-        chunk[14] = msg_len << 3;
-        chunk[15] = (msg_len >> 29);
-        compress(digest, chunk);
+        *(uint64_t *)&chunk[56] = TOLITTLE64((uint64_t)msg_len << 3);
+        compress(digest, (uint32_t *)chunk);
     }
 
     for (i = 0; i < 5; ++i) {
-        *(hash++) = digest[i];
-        *(hash++) = digest[i] >> 8;
-        *(hash++) = digest[i] >> 16;
-        *(hash++) = digest[i] >> 24;
+        *(uint32_t *)hash = TOLITTLE32(digest[i]);
+        hash += sizeof(uint32_t);
     }
 }
