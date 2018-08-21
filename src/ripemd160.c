@@ -25,38 +25,10 @@
 #include <string.h>
 
 #include <btc/ripemd160.h>
+#include <btc/portable_endian.h>
 
-#ifndef LITTLE_ENDIAN
-#define LITTLE_ENDIAN 1234
-#define BIG_ENDIAN 4321
-#endif
-
-#ifndef BYTE_ORDER
-#define BYTE_ORDER LITTLE_ENDIAN
-#endif
-
-#if !defined(BYTE_ORDER) || (BYTE_ORDER != LITTLE_ENDIAN && BYTE_ORDER != BIG_ENDIAN)
-#error Define BYTE_ORDER to be equal to either LITTLE_ENDIAN or BIG_ENDIAN
-#endif
-
-/*** ENDIAN REVERSAL MACROS *******************************************/
-#if BYTE_ORDER != LITTLE_ENDIAN
-#define TOLITTLE32(x) (((x) & 0x000000FF) << 24) | \
-                      (((x) & 0x0000FF00) <<  8) | \
-                      (((x) & 0x00FF0000) >>  8) | \
-                      (((x) & 0xFF000000) >> 24)
-#define TOLITTLE64(x) (((x) & 0x00000000000000FFULL) << 56) | \
-                      (((x) & 0x000000000000FF00ULL) << 40) | \
-                      (((x) & 0x0000000000FF0000ULL) << 24) | \
-                      (((x) & 0x00000000FF000000ULL) <<  8) | \
-                      (((x) & 0x000000FF00000000ULL) >>  8) | \
-                      (((x) & 0x0000FF0000000000ULL) >> 24) | \
-                      (((x) & 0x00FF000000000000ULL) >> 40) | \
-                      (((x) & 0xFF00000000000000ULL) >> 56);
-#else
-#define TOLITTLE32(x) (x)
-#define TOLITTLE64(x) (x)
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
+#define TOLITTLE32 htole32
+#define TOLITTLE64 htole64
 
 
 #define ROL(x, n) (((x) << (n)) | ((x) >> (32 - (n))))

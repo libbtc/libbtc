@@ -32,6 +32,7 @@
 #include <btc/sha2.h>
 #include <stdint.h>
 #include <string.h>
+#include <btc/portable_endian.h>
 
 /*
  * ASSERT NOTE:
@@ -84,12 +85,15 @@
  */
 
 #ifndef LITTLE_ENDIAN
-#define LITTLE_ENDIAN 1234
-#define BIG_ENDIAN 4321
+#define LITTLE_ENDIAN __LITTLE_ENDIAN
+#endif
+
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN __BIG_ENDIAN
 #endif
 
 #ifndef BYTE_ORDER
-#define BYTE_ORDER LITTLE_ENDIAN
+#define BYTE_ORDER __BYTE_ORDER
 #endif
 
 #if !defined(BYTE_ORDER) || (BYTE_ORDER != LITTLE_ENDIAN && BYTE_ORDER != BIG_ENDIAN)
@@ -110,16 +114,11 @@ typedef uint64_t sha2_word64; /* Exactly 8 bytes */
 #if BYTE_ORDER == LITTLE_ENDIAN
 #define REVERSE32(w, x)                                                  \
     {                                                                    \
-        sha2_word32 tmp = (w);                                           \
-        tmp = (tmp >> 16) | (tmp << 16);                                 \
-        (x) = ((tmp & 0xff00ff00UL) >> 8) | ((tmp & 0x00ff00ffUL) << 8); \
+        (x) = htobe32(w);                                                \
     }
 #define REVERSE64(w, x)                                                                      \
     {                                                                                        \
-        sha2_word64 tmp = (w);                                                               \
-        tmp = (tmp >> 32) | (tmp << 32);                                                     \
-        tmp = ((tmp & 0xff00ff00ff00ff00ULL) >> 8) | ((tmp & 0x00ff00ff00ff00ffULL) << 8);   \
-        (x) = ((tmp & 0xffff0000ffff0000ULL) >> 16) | ((tmp & 0x0000ffff0000ffffULL) << 16); \
+        (x) = htobe64(w);                                                                    \
     }
 #endif /* BYTE_ORDER == LITTLE_ENDIAN */
 
