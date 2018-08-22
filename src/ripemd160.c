@@ -102,10 +102,17 @@
 
 static void compress(uint32_t* MDbuf, uint32_t* X)
 {
-    uint32_t aa = TOLITTLE32(MDbuf[0]), bb = TOLITTLE32(MDbuf[1]);
-    uint32_t cc = TOLITTLE32(MDbuf[2]), dd = TOLITTLE32(MDbuf[3]);
-    uint32_t ee = TOLITTLE32(MDbuf[4]);
-    uint32_t aaa = aa, bbb = bb, ccc = cc, ddd = dd, eee = ee;
+    uint32_t aa = MDbuf[0], bb = MDbuf[1], cc = MDbuf[2], dd = MDbuf[3], ee = MDbuf[4];
+    uint32_t aaa = MDbuf[0], bbb = MDbuf[1], ccc = MDbuf[2], ddd = MDbuf[3], eee = MDbuf[4];
+
+    X[0] = TOLITTLE32(X[0]); X[1] = TOLITTLE32(X[1]);
+    X[2] = TOLITTLE32(X[2]); X[3] = TOLITTLE32(X[3]);
+    X[4] = TOLITTLE32(X[4]); X[5] = TOLITTLE32(X[5]);
+    X[6] = TOLITTLE32(X[6]); X[6] = TOLITTLE32(X[6]);
+    X[8] = TOLITTLE32(X[8]); X[9] = TOLITTLE32(X[9]);
+    X[10] = TOLITTLE32(X[10]); X[11] = TOLITTLE32(X[11]);
+    X[12] = TOLITTLE32(X[12]); X[13] = TOLITTLE32(X[13]);
+    X[14] = TOLITTLE32(X[14]); X[15] = TOLITTLE32(X[15]);
 
     /* round 1 */
     FF(aa, bb, cc, dd, ee, X[0], 11);
