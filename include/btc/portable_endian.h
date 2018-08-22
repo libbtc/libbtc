@@ -60,8 +60,6 @@
 
 #elif defined(__WINDOWS__)
 
-#include <sys/param.h>
-#include <winsock2.h>
 #include <stdlib.h>
 
 #if BYTE_ORDER == LITTLE_ENDIAN
@@ -85,19 +83,19 @@
 
 /* that would be xbox 360 */
 #define htobe16(x) (x)
-#define htole16(x) __builtin_bswap16(x)
+#define htole16(x) _byteswap_ushort(x)
 #define be16toh(x) (x)
-#define le16toh(x) __builtin_bswap16(x)
+#define le16toh(x) _byteswap_ushort(x)
 
 #define htobe32(x) (x)
-#define htole32(x) __builtin_bswap32(x)
+#define htole32(x) _byteswap_ulong(x)
 #define be32toh(x) (x)
-#define le32toh(x) __builtin_bswap32(x)
+#define le32toh(x) _byteswap_ulong(x)
 
 #define htobe64(x) (x)
-#define htole64(x) __builtin_bswap64(x)
+#define htole64(x) _byteswap_uint64(x)
 #define be64toh(x) (x)
-#define le64toh(x) __builtin_bswap64(x)
+#define le64toh(x) _byteswap_uint64(x)
 
 #else
 
