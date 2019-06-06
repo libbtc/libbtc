@@ -100,6 +100,11 @@ The application will try to connect to max 6 peers, send the transaction two two
 How to Build
 ----------------
 
+#### Install dependencies [Ubuntu 18.04]
+```
+sudo apt-get install -y autoconf autotools-dev automake libtool
+```
+
 #### Full library including CLI tool and wallet database
 ```
 ./autogen.sh
