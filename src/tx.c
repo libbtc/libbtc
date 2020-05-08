@@ -685,15 +685,23 @@ btc_bool btc_tx_add_address_out(btc_tx* tx, const btc_chainparams* chain, int64_
         unsigned char programm[40] = {0};
         size_t programmlen = 0;
         if(segwit_addr_decode(&version, programm, &programmlen, chain->bech32_hrp, address) == 1) {
-            if (programmlen == 20) {
-                btc_tx_out* tx_out = btc_tx_out_new();
-                tx_out->script_pubkey = cstr_new_sz(1024);
-
-                btc_script_build_p2wpkh(tx_out->script_pubkey, (const uint8_t *)programm);
-
-                tx_out->value = amount;
-                vector_add(tx->vout, tx_out);
+            if (version != 0 || (programmlen != 20 && programmlen != 32)) {
+                return false;
             }
+
+            btc_tx_out* tx_out = btc_tx_out_new();
+            tx_out->script_pubkey = cstr_new_sz(1024);
+
+            if (programmlen == 20) {
+                btc_script_build_p2wpkh(tx_out->script_pubkey, (const uint8_t *)programm);
+            } else {
+                btc_script_build_p2wsh(tx_out->script_pubkey, (const uint8_t *)programm);
+            }
+
+            tx_out->value = amount;
+            vector_add(tx->vout, tx_out);
+
+            return true;
         }
         return false;
     }

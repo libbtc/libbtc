@@ -22,7 +22,7 @@
  OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  OTHER DEALINGS IN THE SOFTWARE.
- 
+
 */
 
 #include <btc/script.h>
@@ -250,6 +250,24 @@ btc_bool btc_script_is_pubkeyhash(const vector* ops, vector* data_out)
     return false;
 }
 
+// OP_0, OP_PUBKEYHASH
+btc_bool btc_script_is_witnesspubkey(const vector* ops, vector* data_out)
+{
+    if ((ops->len == 2) &&
+        btc_script_is_op(vector_idx(ops, 0), OP_0) &&
+        btc_script_is_op_pubkeyhash(vector_idx(ops, 1))) {
+        if (data_out) {
+            //copy the data (hash160) in case of a non empty vector
+            const btc_script_op* op = vector_idx(ops, 1);
+            uint8_t* buffer = btc_calloc(1, sizeof(uint160));
+            memcpy(buffer, op->data, sizeof(uint160));
+            vector_add(data_out, buffer);
+        }
+        return true;
+    }
+    return false;
+}
+
 // OP_HASH160, OP_PUBKEYHASH, OP_EQUAL
 btc_bool btc_script_is_scripthash(const vector* ops, vector* data_out)
 {
@@ -266,6 +284,25 @@ btc_bool btc_script_is_scripthash(const vector* ops, vector* data_out)
             vector_add(data_out, buffer);
         }
 
+        return true;
+    }
+    return false;
+}
+
+// OP_0, OP_SHA256HASH
+btc_bool btc_script_is_witnessscripthash(const vector* ops, vector* data_out)
+{
+    if ((ops->len == 2) &&
+        btc_script_is_op(vector_idx(ops, 0), OP_0) &&
+        btc_script_is_pushdata(((btc_script_op*)vector_idx(ops, 1))->op) &&
+        ((btc_script_op*)vector_idx(ops, 1))->datalen == SHA256_DIGEST_LENGTH) {
+        if (data_out) {
+            //copy the data (sha256 digest) in case of a non empty vector
+            const btc_script_op* op = vector_idx(ops, 1);
+            uint8_t* buffer = btc_calloc(1, SHA256_DIGEST_LENGTH);
+            memcpy(buffer, op->data, SHA256_DIGEST_LENGTH);
+            vector_add(data_out, buffer);
+        }
         return true;
     }
     return false;
@@ -303,6 +340,10 @@ enum btc_tx_out_type btc_script_classify_ops(const vector* ops)
         return BTC_TX_PUBKEY;
     if (btc_script_is_multisig(ops))
         return BTC_TX_MULTISIG;
+    if (btc_script_is_witnesspubkey(ops, NULL))
+        return BTC_TX_WITNESS_V0_PUBKEYHASH;
+    if (btc_script_is_witnessscripthash(ops, NULL))
+        return BTC_TX_WITNESS_V0_SCRIPTHASH;
 
     return BTC_TX_NONSTANDARD;
 }
@@ -439,6 +480,15 @@ btc_bool btc_script_build_p2sh(cstring* script_in, const uint160 hash160)
     btc_script_append_op(script_in, OP_HASH160);
     btc_script_append_pushdata(script_in, (unsigned char*)hash160, sizeof(uint160));
     btc_script_append_op(script_in, OP_EQUAL);
+
+    return true;
+}
+
+btc_bool btc_script_build_p2wsh(cstring* script_in, const uint256 hash256)
+{
+    cstr_resize(script_in, 0); //clear script
+    btc_script_append_op(script_in, OP_0);
+    btc_script_append_pushdata(script_in, (unsigned char*)hash256, sizeof(uint256));
 
     return true;
 }
