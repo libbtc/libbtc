@@ -37,7 +37,10 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+#ifndef _MSC_VER
+#  include <unistd.h>
+#endif
+
 
 #include <search.h>
 
@@ -50,9 +53,9 @@ uint8_t WALLET_DB_REC_TYPE_TX = 2;
 static const unsigned char file_hdr_magic[4] = {0xA8, 0xF0, 0x11, 0xC5}; /* header magic */
 static const uint32_t current_version = 1;
 
-static const char* hdkey_key = "hdkey";
-static const char* hdmasterkey_key = "mstkey";
-static const char* tx_key = "tx";
+static const char hdkey_key[] = "hdkey";
+static const char hdmasterkey_key[] = "mstkey";
+static const char tx_key[] = "tx";
 
 
 /* ====================== */
@@ -488,10 +491,11 @@ btc_wallet_hdnode* btc_wallet_find_hdnode_byaddr(btc_wallet* wallet, const char*
     if (!wallet || !search_addr)
         return NULL;
 
-    uint8_t hashdata[strlen(search_addr)];
+    uint8_t *hashdata = (uint8_t *)btc_malloc(strlen(search_addr));
     memset(hashdata, 0, sizeof(uint160));
     int outlen = btc_base58_decode_check(search_addr, hashdata, strlen(search_addr));
     if (outlen == 0) {
+        btc_free(hashdata);
         return NULL;
     }
 
@@ -695,8 +699,7 @@ btc_bool btc_wallet_is_spent(btc_wallet* wallet, uint256 hash, uint32_t n)
     if (!wallet)
         return false;
 
-    unsigned int i = 0;
-    for (i = wallet->spends->len; i > 0; i--) {
+    for (size_t i = wallet->spends->len; i > 0; i--) {
         btc_tx_outpoint* outpoint = vector_idx(wallet->spends, i - 1);
         if (memcmp(outpoint->hash, hash, BTC_HASH_LENGTH) == 0 && n == outpoint->n)
             return true;

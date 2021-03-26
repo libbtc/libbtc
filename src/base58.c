@@ -27,6 +27,7 @@
 #include <sys/types.h>
 
 #include <btc/chainparams.h>
+#include <btc/memory.h>
 #include <btc/segwit_addr.h>
 #include <btc/sha2.h>
 
@@ -46,8 +47,9 @@ int btc_base58_decode(void* bin, size_t* binszp, const char* b58)
     size_t binsz = *binszp;
     const unsigned char* b58u = (const void*)b58;
     unsigned char* binu = bin;
-    size_t outisz = (binsz + 3) / 4;
-    uint32_t outi[outisz];
+    const size_t outisz = (binsz + 3) / 4;
+    const size_t outilen = sizeof(uint32_t) * outisz;
+    uint32_t *outi = (uint32_t *)btc_malloc(outilen);
     uint64_t t;
     uint32_t c;
     size_t i, j;
@@ -58,7 +60,7 @@ int btc_base58_decode(void* bin, size_t* binszp, const char* b58)
 
     b58sz = strlen(b58);
 
-    memset(outi, 0, outisz * sizeof(*outi));
+    memset(outi, 0, outilen);
 
     // Leading zeros, just count
     for (i = 0; i < b58sz && !b58digits_map[b58u[i]]; ++i) {
@@ -68,10 +70,12 @@ int btc_base58_decode(void* bin, size_t* binszp, const char* b58)
     for (; i < b58sz; ++i) {
         if (b58u[i] & 0x80) {
             // High-bit set on invalid digit
+            btc_free(outi);
             return false;
         }
         if (b58digits_map[b58u[i]] == -1) {
             // Invalid base58 digit
+            btc_free(outi);
             return false;
         }
         c = (unsigned)b58digits_map[b58u[i]];
@@ -82,12 +86,14 @@ int btc_base58_decode(void* bin, size_t* binszp, const char* b58)
         }
         if (c) {
             // Output number too big (carry to the next int32)
-            memset(outi, 0, outisz * sizeof(*outi));
+            memset(outi, 0, outilen);
+            btc_free(outi);
             return false;
         }
         if (outi[0] & zeromask) {
             // Output number too big (last int32 filled too far)
-            memset(outi, 0, outisz * sizeof(*outi));
+            memset(outi, 0, outilen);
+            btc_free(outi);
             return false;
         }
     }
@@ -122,7 +128,8 @@ int btc_base58_decode(void* bin, size_t* binszp, const char* b58)
     }
     *binszp += zerocount;
 
-    memset(outi, 0, outisz * sizeof(*outi));
+    memset(outi, 0, outilen);
+    btc_free(outi);
     return true;
 }
 
@@ -157,15 +164,14 @@ int btc_base58_encode(char* b58, size_t* b58sz, const void* data, size_t binsz)
 {
     const uint8_t* bin = data;
     int carry;
-    ssize_t i, j, high, zcount = 0;
-    size_t size;
+    ssize_t i, j = 0, high, zcount = 0;
 
     while (zcount < (ssize_t)binsz && !bin[zcount]) {
         ++zcount;
     }
 
-    size = (binsz - zcount) * 138 / 100 + 1;
-    uint8_t buf[size];
+    const size_t size = (binsz - zcount) * 138 / 100 + 1;
+    uint8_t *buf = (uint8_t *)btc_malloc(size);
     memset(buf, 0, size);
 
     for (i = zcount, high = size - 1; i < (ssize_t)binsz; ++i, high = j) {
@@ -182,6 +188,7 @@ int btc_base58_encode(char* b58, size_t* b58sz, const void* data, size_t binsz)
     if (*b58sz <= zcount + size - j) {
         *b58sz = zcount + size - j + 1;
         memset(buf, 0, size);
+        btc_free(buf);
         return false;
     }
 
@@ -195,6 +202,7 @@ int btc_base58_encode(char* b58, size_t* b58sz, const void* data, size_t binsz)
     *b58sz = i + 1;
 
     memset(buf, 0, size);
+    btc_free(buf);
     return true;
 }
 
@@ -204,7 +212,7 @@ int btc_base58_encode_check(const uint8_t* data, int datalen, char* str, int str
     if (datalen > 128) {
         return 0;
     }
-    uint8_t buf[datalen + 32];
+    uint8_t buf[128 + 32];
     uint8_t* hash = buf + datalen;
     memcpy(buf, data, datalen);
     sha256_Raw(data, datalen, hash);
@@ -213,9 +221,9 @@ int btc_base58_encode_check(const uint8_t* data, int datalen, char* str, int str
     if (btc_base58_encode(str, &res, buf, datalen + 4) != true) {
         ret = 0;
     } else {
-        ret = res;
+        ret = (int)res;
     }
-    memset(buf, 0, sizeof(buf));
+    memset(buf, 0, datalen);
     return ret;
 }
 
@@ -232,7 +240,7 @@ int btc_base58_decode_check(const char* str, uint8_t* data, size_t datalen)
 
     size_t binsize = strl;
     if (btc_base58_decode(data, &binsize, str) != true) {
-        ret = 0;
+        return 0;
     }
 
     memmove(data, data + strl - binsize, binsize);
@@ -241,7 +249,7 @@ int btc_base58_decode_check(const char* str, uint8_t* data, size_t datalen)
     if (btc_b58check(data, binsize, str) < 0) {
         ret = 0;
     } else {
-        ret = binsize;
+        ret = (int)binsize;
     }
     return ret;
 }
@@ -252,6 +260,16 @@ btc_bool btc_p2pkh_addr_from_hash160(const uint160 hashin, const btc_chainparams
     memcpy(hash160 + 1, hashin, sizeof(uint160));
 
     return (btc_base58_encode_check(hash160, sizeof(uint160)+1, addrout, len) > 0);
+}
+
+btc_bool btc_p2sh_addr_from_hash160(const uint160 hashin, const btc_chainparams* chain, char* addrout,
+                                    int len)
+{
+    uint8_t hash160[sizeof(uint160) + 1];
+    hash160[0] = chain->b58prefix_script_address;
+    memcpy(hash160 + 1, hashin, sizeof(uint160));
+
+    return (btc_base58_encode_check(hash160, sizeof(uint160) + 1, addrout, len) > 0);
 }
 
 btc_bool btc_p2wpkh_addr_from_hash160(const uint160 hashin, const btc_chainparams* chain, char *addrout) {

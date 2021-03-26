@@ -10,17 +10,23 @@
 
 static secp256k1_context* secp256k1_ctx = NULL;
 
-void btc_ecc_start(void)
+btc_bool btc_ecc_start(void)
 {
     btc_random_init();
 
     secp256k1_ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-    assert(secp256k1_ctx != NULL);
+    if (secp256k1_ctx == NULL)
+        return false;
 
     uint8_t seed[32];
-    assert(btc_random_bytes(seed, 32, 0));
-    int ret = secp256k1_context_randomize(secp256k1_ctx, seed);
-    assert(ret);
+    int ret;
+    ret = btc_random_bytes(seed, 32, 0);
+    if (!ret)
+        return false;
+    ret = secp256k1_context_randomize(secp256k1_ctx, seed);
+    if (!ret)
+        return false;
+    return true;
 }
 
 

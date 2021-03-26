@@ -1,4 +1,5 @@
 #include "utest.h"
+#include <stdarg.h>
 #include <btc/block.h>
 #include <btc/net.h>
 #include <btc/utils.h>

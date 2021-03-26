@@ -35,13 +35,15 @@
 
 typedef uint8_t btc_bool; //!serialize, c/c++ save bool
 
-#ifndef true
-#define true 1
-#endif
+#ifndef __cplusplus
+# ifndef true
+#  define true 1
+# endif
 
-#ifndef false
-#define false 0
-#endif
+# ifndef false
+#  define false 0
+# endif
+#endif //__cplusplus
 
 #ifdef __cplusplus
 # define LIBBTC_BEGIN_DECL extern "C" {
@@ -63,6 +65,11 @@ typedef uint8_t btc_bool; //!serialize, c/c++ save bool
 #else
 #define LIBBTC_API
 #endif
+#endif
+
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
 #endif
 
 #define BTC_ECKEY_UNCOMPRESSED_LENGTH 65

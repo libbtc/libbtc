@@ -369,8 +369,10 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             bufferevent_enable(node->event_bev, EV_READ | EV_WRITE);
             if (bufferevent_socket_connect(node->event_bev, (struct sockaddr*)&node->addr, sizeof(node->addr)) < 0) {
                 /* Error starting connection */
-                if (node->event_bev)
+                if (node->event_bev) {
                     bufferevent_free(node->event_bev);
+                    node->event_bev = NULL;
+                }
                 return false;
             }
 

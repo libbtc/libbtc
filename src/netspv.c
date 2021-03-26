@@ -36,19 +36,19 @@
 #include <btc/utils.h>
 
 #ifdef _WIN32
-#include <getopt.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
+#include <getopt.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 #include <assert.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <time.h>
 
 static const unsigned int HEADERS_MAX_RESPONSE_TIME = 60;
