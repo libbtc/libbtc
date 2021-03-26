@@ -63,21 +63,26 @@ void btc_privkey_cleanse(btc_key* privkey)
 }
 
 
-void btc_privkey_gen(btc_key* privkey)
+btc_bool btc_privkey_gen(btc_key* privkey)
 {
     if (privkey == NULL)
-        return;
+        return false;
 
     do {
-        assert(btc_random_bytes(privkey->privkey, BTC_ECKEY_PKEY_LENGTH, 0));
+        const btc_bool res = btc_random_bytes(privkey->privkey, BTC_ECKEY_PKEY_LENGTH, 0);
+        if (!res)
+            return false;
     } while (btc_ecc_verify_privatekey(privkey->privkey) == 0);
+    return true;
 }
 
 
 btc_bool btc_privkey_verify_pubkey(btc_key* privkey, btc_pubkey* pubkey)
 {
     uint256 rnddata, hash;
-    assert(btc_random_bytes(rnddata, BTC_HASH_LENGTH, 0));
+    const btc_bool res = btc_random_bytes(rnddata, BTC_HASH_LENGTH, 0);
+    if (!res)
+        return false;
     btc_hash(rnddata, BTC_HASH_LENGTH, hash);
 
     unsigned char sig[74];
@@ -104,19 +109,24 @@ btc_bool btc_privkey_decode_wif(const char *privkey_wif, const btc_chainparams* 
     if (!privkey_wif || strlen(privkey_wif) < 50) {
         return false;
     }
-    uint8_t privkey_data[strlen(privkey_wif)];
-    memset(privkey_data, 0, sizeof(privkey_data));
+
+    const size_t privkey_len = strlen(privkey_wif);
+    uint8_t *privkey_data = (uint8_t *)btc_malloc(privkey_len);
+    memset(privkey_data, 0, privkey_len);
     size_t outlen = 0;
 
-    outlen = btc_base58_decode_check(privkey_wif, privkey_data, sizeof(privkey_data));
+    outlen = btc_base58_decode_check(privkey_wif, privkey_data, privkey_len);
     if (!outlen) {
+        btc_free(privkey_data);
         return false;
     }
     if (privkey_data[0] != chain->b58prefix_secret_address) {
+        btc_free(privkey_data);
         return false;
     }
     memcpy(privkey->privkey, &privkey_data[1], BTC_ECKEY_PKEY_LENGTH);
-    btc_mem_zero(&privkey_data, sizeof(privkey_data));
+    btc_mem_zero(privkey_data, sizeof(privkey_data));
+    btc_free(privkey_data);
     return true;
 }
 

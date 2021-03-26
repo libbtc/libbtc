@@ -25,8 +25,9 @@
 */
 
 #include <btc/random.h>
-
-#include "libbtc-config.h"
+#ifdef HAVE_CONFIG_H
+#  include "libbtc-config.h"
+#endif
 
 #include <assert.h>
 #include <stdio.h>

@@ -31,8 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 
+#include <btc/memory.h>
 #include <btc/utils.h>
 
 #ifdef WIN32
@@ -61,6 +61,10 @@
 
 #include <io.h> /* for _commit */
 #include <shlobj.h>
+
+#else /* WIN32 */
+
+#include <unistd.h>
 
 #endif
 

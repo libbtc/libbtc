@@ -72,13 +72,13 @@ script:
     - make -j2 V=1
     - ls -la
     - if ( [ "$VALGRIND_UNIT_TESTS" == "yes" ] ); then
-          valgrind --track-origins=yes --leak-check=full --error-exitcode=1 ./tests;
+          valgrind --track-origins=yes --leak-check=full --error-exitcode=1 ./tests &&
           ./tests;
       fi
     - if ( [ "$RUN_MAKE_CHECK" == "yes" ] ); then
-          make check;
-          if [ ! -f test-suite.log; ]; then
+          if ! make check; then
               cat test-suite.log;
+              false;
           fi
       fi
     - if ( [ "$RUN_WINE_UNIT_TESTS" == "yes" ] ); then
