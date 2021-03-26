@@ -78,9 +78,10 @@ btc_bool btc_script_copy_without_op_codeseperator(const cstring* script_in, cstr
 
         if (data_len > 0) {
             assert(data_len < 16777215); //limit max push to 0xFFFFFF
-            unsigned char bufpush[data_len];
-            deser_bytes(&bufpush, &buf, data_len);
-            cstr_append_buf(script_out, &bufpush, data_len);
+            unsigned char *bufpush = (unsigned char *)btc_malloc(data_len);
+            deser_bytes(bufpush, &buf, data_len);
+            cstr_append_buf(script_out, bufpush, data_len);
+            btc_free(bufpush);
         } else
             cstr_append_buf(script_out, &opcode, 1);
     }
@@ -94,7 +95,7 @@ err_out:
 btc_script_op* btc_script_op_new()
 {
     btc_script_op* script_op;
-    script_op = btc_calloc(1, sizeof(*script_op));
+    script_op = btc_calloc(1, sizeof(btc_script_op));
 
     return script_op;
 }
@@ -176,7 +177,7 @@ btc_bool btc_script_get_ops(const cstring* script_in, vector* ops_out)
 
     return true;
 err_out:
-    btc_script_op_free(op);
+    btc_script_op_free_cb(op);
     return false;
 }
 

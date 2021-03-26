@@ -78,7 +78,7 @@ void test_eckey()
 
 
     size_t size = 66;
-    char str[size];
+    char str[66];
     int r = btc_pubkey_get_hex(&pubkey, str, &size);
     u_assert_int_eq(r, true);
     u_assert_int_eq(size, 66);

@@ -35,6 +35,8 @@
 #include <btc/tx.h>
 #include <btc/utils.h>
 
+#include <event2/event.h>
+
 #include <assert.h>
 #include <getopt.h>
 #include <inttypes.h>
