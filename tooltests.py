@@ -6,7 +6,7 @@
 import sys, os
 from subprocess import call
 
-valgrind = True;
+valgrind = "VALGRIND_TOOLTESTS" in os.environ
 commands = []
 commands.append(["-v", 0])
 commands.append(["-foobar", 1])
