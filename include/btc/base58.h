@@ -39,6 +39,7 @@ LIBBTC_API int btc_base58_encode(char* b58, size_t* b58sz, const void* data, siz
 LIBBTC_API int btc_base58_decode(void* bin, size_t* binszp, const char* b58);
 
 LIBBTC_API btc_bool btc_p2pkh_addr_from_hash160(const uint160 hashin, const btc_chainparams* chain, char *addrout, int len);
+LIBBTC_API btc_bool btc_p2sh_addr_from_hash160(const uint160 hashin, const btc_chainparams* chain, char* addrout, int len);
 LIBBTC_API btc_bool btc_p2wpkh_addr_from_hash160(const uint160 hashin, const btc_chainparams* chain, char *addrout);
 
 LIBBTC_END_DECL

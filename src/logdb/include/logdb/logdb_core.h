@@ -128,7 +128,7 @@ LIBLOGDB_API size_t logdb_cache_size(logdb_log_db* db);
 LIBLOGDB_API size_t logdb_count_keys(logdb_log_db* db);
 
 /** writes down single record, internal */
-void logdb_write_record(logdb_log_db* db, logdb_record *rec);
+logdb_bool logdb_write_record(logdb_log_db* db, logdb_record *rec);
 
 /** deserializes next logdb record from file */
 logdb_bool logdb_record_deser_from_file(logdb_record* rec, logdb_log_db *db, enum logdb_error *error);

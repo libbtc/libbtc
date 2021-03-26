@@ -42,8 +42,8 @@ commands2.append(["-t -s 5 -i 127.0.0.1:18444 0200000001554fb2f97f8fe299bf01004c
 baseCommand = "./bitcointool"
 baseCommand2 = "./bitcoin-send-tx"
 if valgrind == True:
-    baseCommand = "valgrind --leak-check=full "+baseCommand
-    baseCommand2 = "valgrind --leak-check=full "+baseCommand2
+    baseCommand = "valgrind --track-origins=yes --error-exitcode=1 --leak-check=full "+baseCommand
+    baseCommand2 = "valgrind --track-origins=yes --error-exitcode=1 --leak-check=full "+baseCommand2
 
 errored = False
 for cmd in commands:
