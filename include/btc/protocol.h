@@ -54,6 +54,7 @@ static uint256 NULLHASH = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
 enum service_bits {
     BTC_NODE_NETWORK = (1 << 0),
+    BTC_NODE_COMPACT_FILTERS = (1 << 6),
 };
 
 static const char* BTC_MSG_VERSION = "version";
@@ -67,6 +68,16 @@ static const char* BTC_MSG_GETBLOCKS = "getblocks";
 static const char* BTC_MSG_BLOCK = "block";
 static const char* BTC_MSG_INV = "inv";
 static const char* BTC_MSG_TX = "tx";
+
+static const char* BTC_MSG_GETCFILTERS = "getcfilters";
+static const char* BTC_MSG_CFILTER = "cfilter";
+
+static const char* BTC_MSG_GETCFHEADERS = "getcfheaders";
+static const char* BTC_MSG_CFHEADERS = "cfheaders";
+
+static const char* BTC_MSG_GETCFCHECKPT = "getcfcheckpt";
+static const char* BTC_MSG_CFCHECKPT = "cfcheckpt";
+
 
 enum BTC_INV_TYPE {
     BTC_INV_TYPE_ERROR = 0,

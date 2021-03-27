@@ -543,4 +543,16 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
             /* we should have switched to block request if the oldest_item_of_interest was set correctly */
         }
     }
+    if (strcmp(hdr->command, BTC_MSG_CFILTER) == 0)
+    {
+        client->nodegroup->log_write_cb("Got BTC_MSG_CFILTER\n");
+    }
+    if (strcmp(hdr->command, BTC_MSG_CFHEADERS) == 0)
+    {
+        client->nodegroup->log_write_cb("Got BTC_MSG_CFHEADERS\n");
+    }
+    if (strcmp(hdr->command, BTC_MSG_CFCHECKPT) == 0)
+    {
+        client->nodegroup->log_write_cb("Got BTC_MSG_CFCHECKPT\n");
+    }
 }
