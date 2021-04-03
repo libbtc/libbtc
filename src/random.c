@@ -92,6 +92,7 @@ btc_bool btc_random_bytes_internal(uint8_t* buf, uint32_t len, const uint8_t upd
     ret = CryptGenRandom(hProvider, len, buf);
     assert(ret);
     CryptReleaseContext(hProvider, 0);
+    return ret;
 #else
     (void)update_seed; //unused
     FILE* frand = fopen(RANDOM_DEVICE, "r");
