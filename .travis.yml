@@ -29,7 +29,7 @@ matrix:
         env: RUN_MAKE_CHECK="yes" $BUILD_CONFIG='--enable-debug'
       - os: osx
         compiler: gcc
-        env: RUN_TOOLTESTS="yes" $BUILD_CONFIG=""
+        env: RUN_TOOLTESTS="yes" CMAKE="yes" $BUILD_CONFIG=""
       - os: linux
         compiler: gcc
         env: VALGRIND_UNIT_TESTS="yes" RUN_TOOLTESTS="yes" VALGRIND_TOOLTESTS="yes" SUBMIT_COVERALLS="yes" $BUILD_CONFIG=''
@@ -67,6 +67,8 @@ before_script:
           LIBTOOL_APP_LDFLAGS='-all-static' LDFLAGS='-static' ./configure --prefix=$TRAVIS_BUILD_DIR/depends/$HOST $BUILD_CONFIG; cat config.log;
       elif [ "$SUBMIT_COVERALLS" == "yes" ]; then
           ./configure $BUILD_CONFIG CFLAGS='-fprofile-arcs -ftest-coverage'; cat config.log;
+      elif [ "$CMAKE" == "yes" ]; then
+          cmake . $BUILD_CONFIG;
       else
           ./configure $BUILD_CONFIG; cat config.log;
       fi
