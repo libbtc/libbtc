@@ -503,6 +503,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
                 btc_net_spv_request_headers(client);
             }
             else {
+                if (client->header_connected) { client->header_connected(client); }
                 connected_headers++;
                 if (pindex->header.timestamp > client->oldest_item_of_interest - (BLOCK_GAP_TO_DEDUCT_TO_START_SCAN_FROM * BLOCKS_DELTA_IN_S) ) {
 
